@@ -1,0 +1,222 @@
+ * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+
+
+
+
+
+
+
+#form{
+    display: inline;
+    
+}
+
+
+.ff{
+   background-color: #ffffff;
+}
+
+
+
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #6791ae;
+    color: #ffffff;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #0f0282;
+    margin-bottom: 50px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    
+}
+
+.nav a {
+    color: #ffffff;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.nav .join-btn {
+    background-color: #ffffff;
+    color: #0f0282;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.main-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 50px;
+}
+
+.content {
+    max-width: 50%;
+}
+
+.content h1 {
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+
+.content p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #000000;
+}
+
+.search-bar {
+    display: flex;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 20px 0 0 20px;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #0f0282;
+    color: #ffffff;
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
+}
+
+.image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.image-card {
+    position: relative;
+    margin-bottom: 60px;
+}
+
+.image-card img {
+    width: 500px;
+    border-radius: 40px;
+}
+
+.card-text {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.clients {
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+.intro-section {
+    padding: 50px;
+    text-align: left;
+    margin: 10px;
+}
+
+.intro-section h1 {
+    font-size: 32px;
+    margin-bottom: 15px;
+    color: #000000;
+}
+
+.intro-section p {
+    color: #000000;
+    margin-bottom: 30px;
+}
+
+.service-grid {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.service {
+    max-width: 200px;
+    text-align: center;
+}
+
+.service img {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+.service h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.service p {
+    font-size: 14px;
+    color: #000000;
+}
+
+/* Jobs Section */
+.jobs-section {
+    margin: 50px 0;
+    text-align: center;
+}
+
+.jobs-section h2 {
+    font-size: 24px;
+}
+
+.jobs-section p {
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+.filter-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.filter-buttons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #e0e0e0;
+    color: #062e24;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.filter-buttons button.active {
+    background-color: #0f0282;
+    color: #ffffff;
+}

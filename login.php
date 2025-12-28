@@ -3,31 +3,65 @@ session_start();
 
 $error = "";
 
+/* ---------- AUTO CREATE ADMIN ---------- */
+$conn = mysqli_connect("localhost", "root", "", "happystudy_login");
+if (!$conn) {
+    die("Connection Failed: " . mysqli_connect_error());
+}
+
+// Ensure `isAdmin` column exists (run once manually if not already)
+// ALTER TABLE users ADD COLUMN isAdmin TINYINT(1) DEFAULT 0;
+
+// Check if admin already exists
+$checkAdmin = "SELECT * FROM users WHERE usersUid='admin'";
+$resultAdmin = mysqli_query($conn, $checkAdmin);
+
+if (mysqli_num_rows($resultAdmin) == 0) {
+    // Admin does not exist → create admin
+    $adminName = "Admin";
+    $adminEmail = "admin@happystudy.com";
+    $adminUser = "admin";
+    $adminPass = password_hash("admin123", PASSWORD_DEFAULT);
+    $isAdmin = 1;
+
+    $insertAdmin = "INSERT INTO users 
+        (usersName, usersEmail, usersUid, usersPwd, isAdmin)
+        VALUES 
+        ('$adminName', '$adminEmail', '$adminUser', '$adminPass', $isAdmin)";
+
+    mysqli_query($conn, $insertAdmin);
+}
+/* ---------- END AUTO CREATE ADMIN ---------- */
+
+/* ---------- LOGIN LOGIC ---------- */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $username_email = trim($_POST["username_email"]);
     $password = trim($_POST["password"]);
 
-    // DB connect
-    $conn = mysqli_connect("localhost", "root", "", "happystudy_login");
-
-    if (!$conn) {
-        die("Connection Failed: " . mysqli_connect_error());
-    }
-
-    // Check user by username or email
-    $sql = "SELECT * FROM users WHERE username='$username_email' OR email='$username_email'";
+    // Check user by username OR email
+    $sql = "SELECT * FROM users 
+            WHERE usersUid='$username_email' 
+            OR usersEmail='$username_email'";
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
 
         $row = mysqli_fetch_assoc($result);
 
-        // Password check (not hashed version)
-        if ($row["password"] == $password) {
+        // Verify hashed password
+        if (password_verify($password, $row["usersPwd"])) {
 
-            $_SESSION["username"] = $row["username"];
-            header("Location: home.php"); // redirect after login
+            // Set session variables
+            $_SESSION["username"] = $row["usersUid"];
+            $_SESSION["isAdmin"] = $row["isAdmin"]; // store admin status
+
+            // Redirect based on role
+            if ($row["isAdmin"] == 1) {
+                header("Location: admin.php"); // admin page
+            } else {
+                header("Location: course.php"); // regular user page
+            }
             exit();
 
         } else {
@@ -39,6 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -72,16 +107,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .left p {
             font-size: 20px;
             color: #11004d;
-        }
-        .left button {
-            margin-top: 40px;
-            padding: 12px 35px;
-            background: #0a9b2f;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 18px;
-            cursor: pointer;
         }
 
         .right {
@@ -139,24 +164,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="left">
         <h1>HappyStudY</h1>
         <p>..Your Easy Path to Learning..</p>
-        
     </div>
 
     <div class="right">
         <h2>___Welcome___</h2>
 
-        <?php 
-            if ($error != "") {
-                echo "<div class='msg'>$error</div>";
-            }
+        <?php
+        if ($error != "") {
+            echo "<div class='msg'>$error</div>";
+        }
         ?>
 
         <form method="POST">
             <label>User Name</label>
-            <input type="text" name="username_email" placeholder="Name/Email" required> <br>
+            <input type="text" name="username_email" placeholder="Username / Email" required>
 
             <label>PassWord</label>
-            <input type="password" name="password" placeholder="Password" required> 
+            <input type="password" name="password" placeholder="Password" required>
 
             <button class="btn">Login</button>
         </form>

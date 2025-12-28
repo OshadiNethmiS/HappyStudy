@@ -130,6 +130,24 @@
       border: none;
       border-radius: 20px;
       font-weight: bold;
+
+     /* body { font-family: Arial; background: #eef6fcff; margin:0; }*/
+        .container { display: flex; padding: 20px; gap: 20px; }
+        .left-panel { width: 50%; }
+        .right-panel { width: 50%; padding: 20px; background: #fff; border-left:2px solid #ccc; display: none; flex-direction: column; gap:10px;}
+        .right-panel.active { display: flex; }
+        .course-cards { display: flex; flex-wrap: wrap; gap: 20px; }
+        .card {
+            background: #4d2bc9ff; color: white;
+            width: 200px; padding: 20px;
+            border-radius: 15px; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: scale(1.05); }
+        input, textarea { width: 100%; padding:10px; margin-top:10px; font-size:16px; }
+        button { padding:12px; background:#11004d; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; margin-top:10px;}
+        h1, h2 { text-align:center; }
+        .add-course { background:#f3f3f3; padding:15px; border-radius:10px; margin-bottom:20px;}
     }
     
     

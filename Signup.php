@@ -1,4 +1,6 @@
 <?php
+session_start(); // 1. Start Session at the very top
+
 $showError = "";
 $showSuccess = "";
 
@@ -27,13 +29,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashedPwd = password_hash($password, PASSWORD_DEFAULT);
 
         // Insert query (MATCH DATABASE COLUMN NAMES)
-        $sql = "INSERT INTO users (usersName, usersEmail, usersUid, usersPwd)
-                VALUES ('$name', '$email', '$username', '$hashedPwd')";
+        $sql = "INSERT INTO users (usersName, usersEmail, usersUid, usersPwd, isAdmin)
+                VALUES ('$name', '$email', '$username', '$hashedPwd', 0)";
 
         if (mysqli_query($conn, $sql)) {
-            $showSuccess = "Registration Successful!";
+            // 2. AUTO-LOGIN LOGIC (Session Handling)
+            // Get the ID of the user we just created
+            $newUserId = mysqli_insert_id($conn); 
+
+            // Save details to session so they are "Logged In"
+            $_SESSION["user_id"] = $newUserId; 
+            $_SESSION["username"] = $username;
+            $_SESSION["isAdmin"] = 0; // Default to student
+
+            // Redirect immediately to Course page
+            header("Location: Course.php");
+            exit();
+            
         } else {
-            $showError = "Registration Failed!";
+            $showError = "Registration Failed: " . mysqli_error($conn);
         }
     }
 }
@@ -136,7 +150,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <?php
         if ($showError != "") echo "<div class='msg'>$showError</div>";
-        if ($showSuccess != "") echo "<div class='msg success'>$showSuccess</div>";
         ?>
 
         <form method="POST">
@@ -150,7 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
 
          <div class="register-link">
-            Are you Registed..? <br>
+            Are you Registered..? <br>
             <a href="login.php">Login</a>
         </div>
     </div>

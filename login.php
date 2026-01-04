@@ -9,9 +9,6 @@ if (!$conn) {
     die("Connection Failed: " . mysqli_connect_error());
 }
 
-// Ensure `isAdmin` column exists (run once manually if not already)
-// ALTER TABLE users ADD COLUMN isAdmin TINYINT(1) DEFAULT 0;
-
 // Check if admin already exists
 $checkAdmin = "SELECT * FROM users WHERE usersUid='admin'";
 $resultAdmin = mysqli_query($conn, $checkAdmin);
@@ -55,12 +52,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Set session variables
             $_SESSION["username"] = $row["usersUid"];
             $_SESSION["isAdmin"] = $row["isAdmin"]; // store admin status
+            
+            // --- THIS WAS THE MISSING LINE ---
+            $_SESSION["user_id"] = $row["id"]; 
+            // ---------------------------------
 
             // Redirect based on role
             if ($row["isAdmin"] == 1) {
                 header("Location: admin.php"); // admin page
             } else {
-                header("Location: course.php"); // regular user page
+                header("Location: Course.php"); // regular user page
             }
             exit();
 

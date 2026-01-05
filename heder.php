@@ -79,11 +79,16 @@
       flex-wrap: wrap;
       gap: 20px;                                           
       margin-top: 40px;
+      background:; /*#4d2bc9ff;*/
     }
     
     .card {   /* backgorund size*/
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 40px;
       background: rgba(255, 255, 255, 0.1);
-      width: 250px;
+      width: 0px;
       padding: 30px;
       border-radius: 12px;
       color: white;
@@ -130,7 +135,7 @@
       border: none;
       border-radius: 20px;
       font-weight: bold;
-
+    }
      /* body { font-family: Arial; background: #eef6fcff; margin:0; }*/
         .container { display: flex; padding: 20px; gap: 20px; }
         .left-panel { width: 50%; }
@@ -148,8 +153,7 @@
         button { padding:12px; background:#11004d; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; margin-top:10px;}
         h1, h2 { text-align:center; }
         .add-course { background:#f3f3f3; padding:15px; border-radius:10px; margin-bottom:20px;}
-    }
-    
+        
     
   </style>
 

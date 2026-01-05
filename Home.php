@@ -1,5 +1,5 @@
 <?php 
-session_start(); // Update 1: Start Session
+session_start(); 
 include_once 'heder.php';
 ?>
 
@@ -12,12 +12,20 @@ include_once 'heder.php';
 <div class="nav">
     <h1>Welcome to Ours HappYstudY ...</h1>
 
-    <?php if(isset($_SESSION['user_id'])): ?>
-        <a href="logout.php" class="button" style="background:#ff4d4d; padding: 10px 20px; text-decoration:none; color:white; border-radius:5px;">Logout</a>
+    <?php if(!isset($_SESSION['user_id'])): ?>
+        <!-- User NOT logged in -->
+        <a href="login.php" class="button" 
+           style="background:#11004d; padding:10px 20px; text-decoration:none; color:white; border-radius:5px;">
+           Login / Register
+        </a>
     <?php else: ?>
-        <a href="login.php" class="button" style="background:#11004d; padding: 10px 20px; text-decoration:none; color:white; border-radius:5px;">Login / Register</a>
+        <a href="login.php" class="button"
+       style="background:#11004d; padding:10px 20px; text-decoration:none; color:white; border-radius:5px;">
+       Login / Register
+    </a>
     <?php endif; ?>
 </div>
+
 
 <div class="main">
     <br><br>

@@ -1,204 +1,192 @@
 <?php
+ob_start();
 session_start();
 
-/* Protect page – only admin can access */
+/* Admin protection */
 if (!isset($_SESSION["username"]) || $_SESSION["isAdmin"] != 1) {
     header("Location: login.php");
     exit();
 }
 
-include_once 'heder.php';
-
-/* Database connection */
+/* DB connection */
 $conn = mysqli_connect("localhost", "root", "", "happystudy_login");
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    die("DB Connection failed");
 }
 
-/* Handle course update */
+/* UPDATE course */
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
-    $course_name = $_POST['course_name'];
-    $course_description = $_POST['course_description'];
-    $start_date = $_POST['start_date'];
-    $duration = $_POST['duration'];
-    $instructor = $_POST['instructor'];
-    $course_fee = $_POST['course_fee'];
 
-    $update_sql = "UPDATE course 
-                   SET course_name='$course_name', course_description='$course_description',
-                       start_date='$start_date', duration='$duration',
-                       instructor='$instructor', course_fee='$course_fee'
-                   WHERE id='$id'";
-    mysqli_query($conn, $update_sql);
+    mysqli_query($conn, "
+        UPDATE course SET
+            course_name='{$_POST['course_name']}',
+            course_description='{$_POST['course_description']}',
+            start_date='{$_POST['start_date']}',
+            duration='{$_POST['duration']}',
+            instructor='{$_POST['instructor']}',
+            course_fee='{$_POST['course_fee']}'
+        WHERE id='$id'
+    ");
+
     header("Location: editcourse.php");
     exit();
 }
 
-/* Handle new course addition */
+/* ADD course */
 if (isset($_POST['add'])) {
-    $course_name = $_POST['new_course_name'];
-    $course_description = $_POST['new_course_description'];
-    $start_date = $_POST['new_start_date'];
-    $duration = $_POST['new_duration'];
-    $instructor = $_POST['new_instructor'];
-    $course_fee = $_POST['new_course_fee'];
+    mysqli_query($conn, "
+        INSERT INTO course
+        (course_name, course_description, start_date, duration, instructor, course_fee)
+        VALUES (
+            '{$_POST['new_course_name']}',
+            '{$_POST['new_course_description']}',
+            '{$_POST['new_start_date']}',
+            '{$_POST['new_duration']}',
+            '{$_POST['new_instructor']}',
+            '{$_POST['new_course_fee']}'
+        )
+    ");
 
-    $add_sql = "INSERT INTO course (course_name, course_description, start_date, duration, instructor, course_fee)
-                VALUES ('$course_name', '$course_description', '$start_date', '$duration', '$instructor', '$course_fee')";
-    mysqli_query($conn, $add_sql);
     header("Location: editcourse.php");
     exit();
 }
 
-/* Handle course deletion */
+/* DELETE course */
 if (isset($_POST['delete'])) {
-    $id = $_POST['id'];
-    $del_sql = "DELETE FROM course WHERE id='$id'";
-    mysqli_query($conn, $del_sql);
+    mysqli_query($conn, "DELETE FROM course WHERE id='{$_POST['id']}'");
     header("Location: editcourse.php");
     exit();
 }
 
-/* Fetch all courses */
-$sql = "SELECT * FROM course";
-$result = mysqli_query($conn, $sql);
+/* Fetch courses */
+$result = mysqli_query($conn, "SELECT * FROM course ORDER BY id DESC");
 
+include_once 'heder.php';
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Courses</title>
-    <style>
-        body { font-family: Arial; background: #eef6fcff; margin:0; }
-        .container { display: flex; padding: 20px; gap: 20px; }
-        .left-panel { width: 50%; }
-        .right-panel { width: 50%; padding: 20px; background: #fff; border-left:2px solid #ccc; display: none; flex-direction: column; gap:10px;}
-        .right-panel.active { display: flex; }
-        .course-cards { display: flex; flex-wrap: wrap; gap: 20px; }
-        .card {
-            background: #4d2bc9ff; color: white;
-            width: 200px; padding: 20px;
-            border-radius: 15px; cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .card:hover { transform: scale(1.05); }
-        input, textarea { width: 100%; padding:10px; margin-top:10px; font-size:16px; }
-        button { padding:12px; background:#11004d; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; margin-top:10px;}
-        h1, h2 { text-align:center; }
-        .add-course { background:#f3f3f3; padding:15px; border-radius:10px; margin-bottom:20px;}
-        label { font-weight: bold; margin-top: 10px; display:block;}
-    </style>
+<title>Edit Courses</title>
+<style>
+body { font-family: Arial; background:#eef6fcff; margin:0; }
+h1 { text-align:center; }
+
+.container { display:flex; gap:20px; padding:20px; }
+.left-panel { width:50%; }
+.right-panel {
+    width:50%; background:#fff; padding:20px;
+    border-left:2px solid #ccc;
+    display:none;
+}
+.right-panel.active { display:block; }
+
+.course-cards { display:flex; flex-wrap:wrap; gap:15px; }
+.card {
+    background:#4d2bc9ff; color:white;
+    width:220px; padding:15px;
+    border-radius:12px;
+    cursor:pointer;
+}
+.card h3 { margin:0 0 5px 0; }
+
+input, textarea {
+    width:100%; padding:10px; margin-top:10px;
+}
+button {
+    padding:10px; border:none; border-radius:6px;
+    background:#11004d; color:white; margin-top:10px;
+}
+.add-course {
+    background:#f3f3f3; padding:15px;
+    border-radius:10px; margin-bottom:20px;
+}
+</style>
 </head>
+
 <body>
 
-<h1>Edit Courses</h1>
+<h1>📘 Edit Courses</h1>
 
 <div class="container">
 
-    <!-- Left Panel: Add & Course Cards -->
-    <div class="left-panel">
-        <!-- Add New Course -->
-        <div class="add-course">
-            <h2>Add New Course</h2>
-            <form method="POST">
-                <label>Course Name:</label>
-                <input type="text" name="new_course_name" required>
+<!-- LEFT -->
+<div class="left-panel">
 
-                <label>Course Description:</label>
-                <textarea name="new_course_description" rows="3" required></textarea>
+<div class="add-course">
+<h2>Add New Course</h2>
+<form method="POST">
+    <input type="text" name="new_course_name" placeholder="Course Name" required>
+    <textarea name="new_course_description" placeholder="Description" required></textarea>
+    <input type="date" name="new_start_date" required>
+    <input type="text" name="new_duration" placeholder="Duration" required>
+    <input type="text" name="new_instructor" placeholder="Instructor" required>
+    <input type="number" step="0.01" name="new_course_fee" placeholder="Fee" required>
+    <button name="add">Add Course</button>
+</form>
+</div>
 
-                <label>Start Date:</label>
-                <input type="date" name="new_start_date" required>
+<div class="course-cards">
+<?php while ($row = mysqli_fetch_assoc($result)) {
+    $json = htmlspecialchars(json_encode($row), ENT_QUOTES);
+    echo "
+    <div class='card' data-course='$json'>
+        <h3>{$row['course_name']}</h3>
+        <p>{$row['duration']}</p>
+        <small>Rs. {$row['course_fee']}</small>
+    </div>";
+} ?>
+</div>
 
-                <label>Duration:</label>
-                <input type="text" name="new_duration" placeholder="e.g., 3 months" required>
+</div>
 
-                <label>Instructor:</label>
-                <input type="text" name="new_instructor" required>
+<!-- RIGHT -->
+<div class="right-panel" id="editPanel">
+<h2>Edit Course</h2>
+<form method="POST">
+    <input type="hidden" name="id" id="cid">
 
-                <label>Course Fee:</label>
-                <input type="number" step="0.01" name="new_course_fee" required>
+    <input type="text" name="course_name" id="cname" required>
+    <textarea name="course_description" id="cdesc" required></textarea>
+    <input type="date" name="start_date" id="cstart" required>
+    <input type="text" name="duration" id="cdur" required>
+    <input type="text" name="instructor" id="cins" required>
+    <input type="number" step="0.01" name="course_fee" id="cfee" required>
 
-                <button type="submit" name="add">Add Course</button>
-            </form>
-        </div>
-
-        <!-- Course Cards -->
-        <div class="course-cards">
-            <?php
-            if (mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $data_attr = htmlspecialchars(json_encode($row), ENT_QUOTES);
-                    echo "<div class='card' data-course='$data_attr'>
-                            <h3>".$row['course_name']."</h3>
-                            <p>".substr($row['course_description'],0,50)."...</p>
-                          </div>";
-                }
-            } else {
-                echo "<p>No courses available.</p>";
-            }
-            ?>
-        </div>
-    </div>
-
-    <!-- Right Panel: Edit/Delete Course -->
-    <div class="right-panel" id="editPanel">
-        <h2>Edit Course</h2>
-        <form method="POST">
-            <input type="hidden" name="id" id="courseId">
-            
-            <label>Course Name:</label>
-            <input type="text" name="course_name" id="courseName" required>
-
-            <label>Course Description:</label>
-            <textarea name="course_description" id="courseDesc" rows="3" required></textarea>
-
-            <label>Start Date:</label>
-            <input type="date" name="start_date" id="courseStart" required>
-
-            <label>Duration:</label>
-            <input type="text" name="duration" id="courseDuration" required>
-
-            <label>Instructor:</label>
-            <input type="text" name="instructor" id="courseInstructor" required>
-
-            <label>Course Fee:</label>
-            <input type="number" step="0.01" name="course_fee" id="courseFee" required>
-
-            <button type="submit" name="update">Save Changes</button>
-            <button type="submit" name="delete" style="background:red;">Delete Course</button>
-        </form>
-    </div>
+    <button name="update">Update</button>
+    <button name="delete" style="background:red;">Delete</button>
+</form>
+</div>
 
 </div>
 
 <script>
-    const cards = document.querySelectorAll('.card');
-    const editPanel = document.getElementById('editPanel');
-    const courseId = document.getElementById('courseId');
-    const courseName = document.getElementById('courseName');
-    const courseDesc = document.getElementById('courseDesc');
-    const courseStart = document.getElementById('courseStart');
-    const courseDuration = document.getElementById('courseDuration');
-    const courseInstructor = document.getElementById('courseInstructor');
-    const courseFee = document.getElementById('courseFee');
+const editPanel = document.getElementById('editPanel');
+const cid = document.getElementById('cid');
+const cname = document.getElementById('cname');
+const cdesc = document.getElementById('cdesc');
+const cstart = document.getElementById('cstart');
+const cdur = document.getElementById('cdur');
+const cins = document.getElementById('cins');
+const cfee = document.getElementById('cfee');
 
-    cards.forEach(card => {
-        card.addEventListener('click', () => {
-            const course = JSON.parse(card.dataset.course);
-            editPanel.classList.add('active');
-            courseId.value = course.id;
-            courseName.value = course.course_name;
-            courseDesc.value = course.course_description;
-            courseStart.value = course.start_date;
-            courseDuration.value = course.duration;
-            courseInstructor.value = course.instructor;
-            courseFee.value = course.course_fee;
-        });
-    });
+document.querySelectorAll('.card').forEach(card=>{
+    card.onclick = () => {
+        const c = JSON.parse(card.dataset.course);
+        editPanel.classList.add('active');
+        cid.value = c.id;
+        cname.value = c.course_name;
+        cdesc.value = c.course_description;
+        cstart.value = c.start_date;
+        cdur.value = c.duration;
+        cins.value = c.instructor;
+        cfee.value = c.course_fee;
+    }
+});
 </script>
 
 </body>
 </html>
+
+<?php ob_end_flush(); ?>

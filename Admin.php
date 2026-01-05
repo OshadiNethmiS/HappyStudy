@@ -20,8 +20,8 @@ include_once 'heder.php';
     </div>
 
     <div style="text-align:right;">
-        <span style="margin-right: 15px;">👤 <?php echo $_SESSION['username']; ?></span>
-        <a href="logout.php" style="padding: 8px 15px; background:#ff4d4d; color:white; border-radius:5px; text-decoration:none;">Logout</a>
+       <span style="margin-right: 15px;">👤 <?php echo $_SESSION['username']; ?></span>
+        <a href="logout.php" >Logout</a>
     </div>
 </header>
 
@@ -33,17 +33,19 @@ include_once 'heder.php';
     <br><br>
     <div class="card_h">
         <div class="cards">
-            <div class="card" style="background: #4d2bc9ff;">
+            <div class="card">
+                <a href="registered_students.php" target="_blank">
                 <h3>📘 Registered</h3>
                 <p>Sign up and register for courses</p>
+                </a>
             </div>
 
-            <a href="editcourse.php" target="_blank">
-                <div class="card" style="background: #4d2bc9ff;">
-                    <h3>✏️ Edit Courses</h3>
-                    <p>Check your registered courses</p>
+                <a href="editcourse.php" target="_blank">
+                <div class="card" >
+                <h3>✏️ Edit Courses</h3>
+                <p>Check your registered courses</p>
                 </div>
-            </a>
+                </a>
         </div>
     </div>
 </div>
